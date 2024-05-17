@@ -17,14 +17,17 @@ class FileStorage:
 
     def new(self, obj):
         """ sets in __objects the obj with key <obj class name>.id """
-        self.__objects[obj.__class__.__name__ + '.' + obj.id] = obj.to_dict()
+        self.__objects[obj.__class__.__name__ + '.' + obj.id] = obj
 
     def save(self):
         """
         serializes __objects to the JSON file (path: __file_path)
         """
+        obj_dic = {}
+        for k, v in self.__objects.items():
+            obj_dic[k] = v.to_dict()
         with open(self.__file_path, "w") as f:
-            f.write(json.dumps(self.__objects))
+            f.write(json.dumps(obj_dic))
 
     def reload(self):
         """
@@ -34,6 +37,12 @@ class FileStorage:
         """
         try:
             with open(self.__file_path, 'r') as f:
-                self.__objects = json.loads(f.read())
+                demo__objects = json.loads(f.read())
+            from models.base_model import BaseModel
+            from models.user import User
+            for k, v in demo__objects.items():
+                cls_name, cls_id = k.split('.')
+                temp_obj = eval(cls_name)(**v)
+                self.__objects[k] = temp_obj
         except Exception:
             pass

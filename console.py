@@ -2,13 +2,16 @@
 """ console model """
 import cmd
 from models.base_model import BaseModel
+from models.user import User
 from models import storage
-
 
 
 class HBNBCommand(cmd.Cmd):
     """Simple command processor example."""
     prompt = "(hbnb) "
+    objects_list = [
+        'BaseModel', 'State', 'City', 'User', 'Amenity', 'Place', 'Review'
+    ]
 
     def do_create(self, line):
         """
@@ -39,11 +42,9 @@ class HBNBCommand(cmd.Cmd):
         elif len(temp_list) == 1:
             print("** instance id missing **")
         else:
-            for key in obj_dict.keys():
+            for key, value in obj_dict.items():
                 if key == f"BaseModel.{temp_list[1]}":
-                    temp_dict = obj_dict[key]
-                    temp_insta = BaseModel(**temp_dict)
-                    print(temp_insta)
+                    print(value)
                     return
             print("** no instance found **")
 
@@ -78,22 +79,19 @@ class HBNBCommand(cmd.Cmd):
         obj_dict = storage.all()
         ret_list = []
 
-        if not line:
-            for k in obj_dict.keys():
-                temp_dict = obj_dict[k]
-                temp_insta = BaseModel(**temp_dict)
-                ret_list.append(temp_insta.__str__())
-            print(ret_list)
-        else:
-            if temp_list[0] != 'BaseModel':
-                print("** class doesn't exist **")
+        for k, v in obj_dict.items():
+            if not line:
+                ret_list.append(v.__str__())     
+            elif len(temp_list) == 1:
+                if temp_list[0] not in HBNBCommand.objects_list:
+                    print("** class doesn't exist **")
+                else:
+                    string, iid = k.split('.')
+                    if k.startswith(temp_list[0]):
+                        ret_list.append(v.__str__())
             else:
-                for k in obj_dict.keys():
-                    if k.startswith("BaseModel."):
-                        temp_dict = obj_dict[k]
-                        temp_insta = BaseModel(**temp_dict)
-                        ret_list.append(temp_insta.__str__())
-                print(ret_list)
+                pass
+        print(ret_list)
 
     def do_update(self, line):
         """
@@ -114,14 +112,10 @@ class HBNBCommand(cmd.Cmd):
         elif len(temp_list) == 3:
             print("** value missing **")
         elif len(temp_list) < 5:
-            for key in obj_dict.keys():
-                if key == f"BaseModel.{temp_list[1]}":
-                    keys_dict = {}
-                    for k, v in obj_dict.items():
-                        if k == temp_list[3]:
-                            keys_dict[k] = temp_list[4]
-                        keys_dict[k] = v
-                    obj_dict[key] = keys_dict
+            for key, value in obj_dict.items():
+                cls_name, cls_id = key.split('.')
+                if cls_id == temp_list[1]:
+                    setattr(value, temp_list[2], temp_list[3])
                     storage.save()
                     return
             print("** no instance found **")
