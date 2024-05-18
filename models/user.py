@@ -14,6 +14,3 @@ class User(BaseModel):
     def __init__(self, *args, **kwargs):
         """consrtructor"""
         super().__init__(*args, **kwargs)
-        
-
-

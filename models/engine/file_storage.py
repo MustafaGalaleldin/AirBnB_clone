@@ -38,8 +38,15 @@ class FileStorage:
         try:
             with open(self.__file_path, 'r') as f:
                 demo__objects = json.loads(f.read())
+
             from models.base_model import BaseModel
             from models.user import User
+            from models.state import State
+            from models.city import City
+            from models.amenity import Amenity
+            from models.place import Place
+            from models.review import Review
+
             for k, v in demo__objects.items():
                 cls_name, cls_id = k.split('.')
                 temp_obj = eval(cls_name)(**v)
