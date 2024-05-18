@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """ console model """
 import cmd
+import re
 from models.base_model import BaseModel
 from models.user import User
 from models.state import State
@@ -20,8 +21,13 @@ class HBNBCommand(cmd.Cmd):
 
     def precmd(self, line):
         """override precmd process"""
-        if '.' in line:
-            l2, l1 = line.split('.') # l1 -> method, l2->class name
+        do_separation = 0  # to ensure its in form class.method() or not
+        for i in HBNBCommand.objects_list:
+            if f"{i}." in line:
+                do_separation = 1
+                break
+        if do_separation:
+            l2, dot, l1 = line.partition('.')  # l1 -> method, l2->class name
             '''
              this is the first not efficient approch
             count = 0
@@ -36,19 +42,22 @@ class HBNBCommand(cmd.Cmd):
             '''
             l1 = l1.replace('(', '|')
             l1 = l1.replace(')', '')
+            like = re.search(r'{.+}', l1)  # catch the dictionary befor " edit
             l1 = l1.replace('"', '')
-            l1 = l1.replace(",", "|")
+            l1 = l1.replace(", ", "|")
+            if like:
+                l1 = re.sub(r'{.+}', '', l1)  # remove dict representation
             mth_list = l1.split('|')
             if l1.endswith('|'):
                 del(mth_list[len(mth_list) - 1])
-            for order, elem in enumerate(mth_list):
+            for order, elem in enumerate(mth_list):  # to ensure no whitespaces
                 mth_list[order] = elem.strip()
-            if len(mth_list) == 1:
-                return f"{mth_list[0]} {l2}"
-            elif len(mth_list) == 2:
-                return f"{mth_list[0]} {l2} {mth_list[1]}"
-            elif len(mth_list) == 4:
-                return f"{mth_list[0]} {l2} {mth_list[1]} {mth_list[2]} {mth_list[3]}"
+            mth_list.insert(1, l2)  # to insert class name
+            if like:
+                for k, v in eval(like.group()).items():
+                    mth_list.insert(len(mth_list), k)  # add k in end
+                    mth_list.insert(len(mth_list), v)  # add v in end
+            return ' '.join(mth_list)
         else:
             return line
 
@@ -155,17 +164,32 @@ class HBNBCommand(cmd.Cmd):
             print("** attribute name missing **")
         elif len(temp_list) == 3:
             print("** value missing **")
-        elif len(temp_list) < 5:
-            for key, value in obj_dict.items():
-                cls_name, cls_id = key.split('.')
+        elif len(temp_list) >= 4 and len(temp_list) % 2 == 0:
+            units = (len(temp_list) - 4) // 2  # units start from 0
+            '''
+            when updating more than 1 attribute, work logic:
+                units ----> number of attributes to be updated 0 when 1 attr
+                make a loop and units decreases by 1 after any update
+                to locate attrs in temp_list:
+                    units+2 , units+3
+                    then multiply units by 2 for every update
+                    to reach the next pair
+                    units * 2 + 2 for attr
+                    units * 2 + 3 for val
+            '''
+            for k, v in obj_dict.items():
+                cls_name, cls_id = k.split('.')
                 if cls_id == temp_list[1]:
-                    setattr(value, temp_list[2], temp_list[3])
+                    while units >= 0:
+                        setattr(v, temp_list[units * 2 + 2],
+                                temp_list[units * 2 + 3])
+                        units -= 1
                     storage.save()
                     return
             print("** no instance found **")
 
     def do_count(self, line):
-        """ retrieve the number of instances of a class: <class name>.count()"""
+        """ retrieve the number of class instances:<class name>.count()"""
         obj_dict = storage.all()
         count = 0
         for k in obj_dict.keys():
@@ -184,6 +208,7 @@ class HBNBCommand(cmd.Cmd):
     def emptyline(self):
         """print nothing"""
         pass
+
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
