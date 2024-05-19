@@ -47,7 +47,7 @@ class StorageTest(unittest.TestCase):
         storage.new(dd)
         storage.new(ee)
         storage.new(ff)
-        storage.new(gg) 
+        storage.new(gg)
         storage.save()
         storage.reload()
         objs = FileStorage._FileStorage__objects
@@ -79,7 +79,7 @@ class StorageTest(unittest.TestCase):
         storage.new(dd)
         storage.new(ee)
         storage.new(ff)
-        storage.new(gg) 
+        storage.new(gg)
         storage.save()
         storage.reload()
         objs = FileStorage._FileStorage__objects
@@ -108,7 +108,7 @@ class StorageTest(unittest.TestCase):
         storage.new(dd)
         storage.new(ee)
         storage.new(ff)
-        storage.new(gg) 
+        storage.new(gg)
         storage.save()
         storage.reload()
         objs = FileStorage._FileStorage__objects
