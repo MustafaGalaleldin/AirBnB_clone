@@ -57,7 +57,7 @@ class HBNBCommand(cmd.Cmd):
                 for k, v in eval(like.group()).items():
                     mth_list.insert(len(mth_list), k)  # add k in end
                     mth_list.insert(len(mth_list), v)  # add v in end
-            return ' '.join(mth_list)
+            return ' '.join(str(x) for x in mth_list)
         else:
             return line
 
