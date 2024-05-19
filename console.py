@@ -138,6 +138,7 @@ class HBNBCommand(cmd.Cmd):
             elif len(temp_list) == 1:
                 if temp_list[0] not in HBNBCommand.objects_list:
                     print("** class doesn't exist **")
+                    return
                 else:
                     string, iid = k.split('.')
                     if k.startswith(temp_list[0]):
