@@ -49,7 +49,7 @@ class HBNBCommand(cmd.Cmd):
                 l1 = re.sub(r'{.+}', '', l1)  # remove dict representation
             mth_list = l1.split('|')
             if l1.endswith('|'):
-                del(mth_list[len(mth_list) - 1])
+                del mth_list[len(mth_list) - 1]
             for order, elem in enumerate(mth_list):  # to ensure no whitespaces
                 mth_list[order] = elem.strip()
             mth_list.insert(1, l2)  # to insert class name
@@ -117,8 +117,8 @@ class HBNBCommand(cmd.Cmd):
         else:
             for key in obj_dict.keys():
                 cls_name, cls_id = key.split('.')
-                if cls_id == temp_list[1]:
-                    del(obj_dict[key])
+                if cls_id == temp_list[1] and cls_name == temp_list[0]:
+                    del obj_dict[key]
                     storage.save()
                     return
             print("** no instance found **")
