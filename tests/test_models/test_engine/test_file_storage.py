@@ -24,13 +24,41 @@ class StorageTest(unittest.TestCase):
         dic = self.inst.all()
         self.assertEqual(type(dic), dict)
 
-    def test_new(self):
+    def test_new_work(self):
         """test new mth"""
         old = len(self.inst.all())
         new1_inst = BaseModel()
         storage.new(new1_inst)
         new = len(self.inst.all())
         self.assertNotEqual(old, new)
+
+    def test_new(self):
+        """ww"""
+        aa = BaseModel()
+        bb = User()
+        cc = Place()
+        dd = Review()
+        ee = State()
+        ff = City()
+        gg = Amenity()
+        storage.new(aa)
+        storage.new(bb)
+        storage.new(cc)
+        storage.new(dd)
+        storage.new(ee)
+        storage.new(ff)
+        storage.new(gg)
+        storage.save()
+        storage.reload()
+        objs = FileStorage._FileStorage__objects
+        self.assertIn("BaseModel." + aa.id, objs)
+        self.assertIn("User." + bb.id, objs)
+        self.assertIn("State." + ee.id, objs)
+        self.assertIn("Place." + cc.id, objs)
+        self.assertIn("City." + ff.id, objs)
+        self.assertIn("Amenity." + gg.id, objs)
+        self.assertIn("Review." + dd.id, objs)
+
 
     def test_save(self):
         """test saving method"""
